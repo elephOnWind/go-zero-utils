@@ -2,6 +2,7 @@ package responsex
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/tal-tech/go-zero/rest/httpx"
 )
@@ -19,19 +20,14 @@ type Body struct {
 	Timestamp int64       `json:"timestamp,string"`
 }
 
-func Success(w http.ResponseWriter, resp interface{}) {
-	var body Body
-	body.Code = DEFAULT_SUCCESS_CODE
-	body.Msg = "Success"
-	body.Data = resp
-	httpx.OkJson(w, body)
+func OkJson(w http.ResponseWriter, resp interface{}) {
+	Response(w, DEFAULT_SUCCESS_CODE, resp, nil)
+}
+func OK(w http.ResponseWriter) {
+	Response(w, DEFAULT_SUCCESS_CODE, nil, nil)
 }
 func Error(w http.ResponseWriter, err error) {
-	var body Body
-	body.Code = DEFAULT_ERROR_CODE
-	body.Msg = err.Error()
-	body.Data = nil
-	httpx.OkJson(w, body)
+	Response(w, DEFAULT_ERROR_CODE, nil, err)
 }
 func Response(w http.ResponseWriter, code int, resp interface{}, err error) {
 	var body Body
@@ -39,8 +35,12 @@ func Response(w http.ResponseWriter, code int, resp interface{}, err error) {
 	if err != nil {
 		body.Msg = err.Error()
 	} else {
-		body.Msg = "OK"
+		body.Msg = "Success"
 		body.Data = resp
 	}
+	body.Timestamp = timestamp()
 	httpx.OkJson(w, body)
+}
+func timestamp() int64 {
+	return time.Now().UnixNano() / 1000
 }
