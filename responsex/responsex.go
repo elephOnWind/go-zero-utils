@@ -1,4 +1,4 @@
-package reponsex
+package responsex
 
 import (
 	"net/http"
